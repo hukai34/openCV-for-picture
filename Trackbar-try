@@ -3,7 +3,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <vector>
+//#include <vector>
 using namespace cv;
 using namespace std;
 
@@ -18,10 +18,12 @@ Mat g_srcImage1;
 Mat g_srcImage2;
 Mat g_dstImage;
 
+//滑条回调函数
 void on_Trackbar(int, void*)
 {
 	g_dAlphaValue = (double)g_nAlphaValueSlider/g_nMaxAlphaValue;
 	g_dBetaValue =(1.0 - g_dAlphaValue);
+	//两张图片叠加
 	addWeighted(g_srcImage1,g_dAlphaValue,g_srcImage2,g_dBetaValue,0.0,g_dstImage);
 	imshow(WINDOW_NAME,g_dstImage);
 }
@@ -37,11 +39,12 @@ int main()
 
 	char TrackbarName[50];
 	sprintf(TrackbarName,"透明值%d",g_nAlphaValueSlider);
-
+	
+        //创建滑条
 	createTrackbar("对比度",WINDOW_NAME,&g_nAlphaValueSlider,g_nMaxAlphaValue,on_Trackbar);
 
 	on_Trackbar(g_nAlphaValueSlider,0);
-  waitKey(0);
+        waitKey(0);
 	return 0;
 	//waitkey(6000);
 }
