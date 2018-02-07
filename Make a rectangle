@@ -11,6 +11,7 @@ using namespace std;
 void on_MouseHandle(int event, int x, int y, int flags, void* param);
 void DrawRectangle(cv::Mat& img, cv::Rect box);
 
+//Rect矩形类
 Rect g_rectangle;
 bool g_bDrawingBox = false;
 RNG g_rng(12345);
@@ -34,7 +35,7 @@ int main(int argc, char** argv)
 			DrawRectangle(tempImage,g_rectangle);
 
 		imshow(WINDOW_NAME,tempImage);
-
+                //按ESC退出
 		if(waitKey(10) == 27)
 			break;
 	}
