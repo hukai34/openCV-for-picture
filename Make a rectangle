@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 	srcImage = Scalar::all(0);
 
 	namedWindow(WINDOW_NAME);
+        //添加鼠标交互操作
 	setMouseCallback(WINDOW_NAME, on_MouseHandle,(void*)&srcImage);
 
 	while(1)
@@ -42,14 +43,14 @@ int main(int argc, char** argv)
 
 }
 
-
+//鼠标事件处理
 void on_MouseHandle(int event, int x, int y, int flags, void* param)
 {
 	Mat& image = *(cv::Mat*) param;
 
 	switch(event)
 	{
-
+         //鼠标移动
 	 case EVENT_MOUSEMOVE:
 		{
 			if(g_bDrawingBox)
@@ -59,14 +60,14 @@ void on_MouseHandle(int event, int x, int y, int flags, void* param)
 			}
 			break;
 		}
-     
+         //鼠标左键按下
 	 case EVENT_LBUTTONDOWN:
 		 {
 			 g_bDrawingBox = true;
 			 g_rectangle = Rect(x,y,5,5);
 			 break;
 		 }
-
+         //鼠标左键放开
 	 case EVENT_LBUTTONUP:
 		 {
 			 g_bDrawingBox = false;
@@ -92,4 +93,5 @@ void on_MouseHandle(int event, int x, int y, int flags, void* param)
 void DrawRectangle(cv::Mat& img, cv::Rect box)
 {
 	rectangle(img,box.tl(),box.br(),Scalar(g_rng.uniform(0,255),g_rng.uniform(0,255),g_rng.uniform(0,255)),5);
+	//画矩形接口rectangle
 }
