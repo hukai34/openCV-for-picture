@@ -1,0 +1,153 @@
+//可用键盘输入L、R、C来选择画彩色直线、矩形、园，画图轨迹可见，画图效果保留，按ESC退出
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
+#include <vector>
+using namespace cv;
+using namespace std;
+
+Rect g_rectangle;
+RNG g_rng(12345);
+bool g_bDrawingBox = false; //鼠标左键按下标志
+int Imageflag = 0;  //标志之前有鼠标按下
+int key = 0; //记录键盘输入
+
+#define WINDOW_NAME "[绘制图]"
+
+#define LINE 76
+#define CIRCLE 67
+#define RECT 82
+#define ESC 27
+
+
+//构造画线函数
+void DrawLine(Mat& img, Rect box)
+{
+	int thickness = 2;
+	int lineType = 8;
+	line(img, box.br(),box.tl(), Scalar(g_rng.uniform(0,255),g_rng.uniform(0,255),g_rng.uniform(0,255)), thickness, lineType);
+}
+
+//构造画圆函数
+void DrawFilledCircle(Mat& img, Rect box)
+{
+	int thickness = 2;
+	int lineType = 8;
+	circle(img, box.tl(), box.height, Scalar(g_rng.uniform(0,255),g_rng.uniform(0,255),g_rng.uniform(0,255)), thickness, lineType);
+}
+
+//构造画矩形函数
+void DrawRectangle(Mat& img, Rect box)
+{
+	int thickness = 2;
+	int lineType = 8;
+
+	if(box.width<0)
+	{
+		box.x += box.width;
+		box.width *= -1;
+	}
+
+	if(box.height<0)
+	{
+		box.y += box.height;
+		box.height *= -1;
+	}
+
+	rectangle(img,box.tl(),box.br(),Scalar(g_rng.uniform(0,255),g_rng.uniform(0,255),g_rng.uniform(0,255)), thickness, lineType);
+}
+
+//鼠标动作判断函数
+void on_MouseHandle(int event, int x, int y, int flags, void* param)
+{
+
+	switch(event)
+	{
+		//鼠标移动事件
+	 case EVENT_MOUSEMOVE:
+		{
+			if(g_bDrawingBox)
+			{
+			 g_rectangle.width = x-g_rectangle.x;
+			 g_rectangle.height = y-g_rectangle.y;
+			}
+			break;
+		}
+        //鼠标左键按下事件
+	 case EVENT_LBUTTONDOWN:
+		 {
+			 g_bDrawingBox = true;
+			 g_rectangle = Rect(x,y,0,0);
+			 break;
+		 }
+		 //鼠标左键放开事件
+	 case EVENT_LBUTTONUP:
+		 {
+			 g_bDrawingBox = false;
+			 break;
+		 }
+	}
+}
+
+int main()
+{
+	g_rectangle = Rect(-1,-1,0,0);
+	Mat srcImage(600, 800, CV_8UC3), tempImage;
+	srcImage.copyTo(tempImage);
+	srcImage = Scalar::all(0);
+
+	namedWindow(WINDOW_NAME);
+	//添加鼠标交互
+	setMouseCallback(WINDOW_NAME, on_MouseHandle,(void*)&srcImage);
+
+	while(1)
+	{
+		int keyOne = waitKey(5);
+
+		if(keyOne != -1)
+			key = keyOne;
+
+		//鼠标左键按下
+		if(g_bDrawingBox)
+	    {
+		   Imageflag = 1;
+
+		   if(key == LINE)
+		        DrawLine(tempImage,g_rectangle);
+		
+		   else if(key == CIRCLE)
+				DrawFilledCircle(tempImage,g_rectangle);
+		
+		   else if(key == RECT)		   
+				DrawRectangle(tempImage,g_rectangle);
+
+		}
+
+	    imshow(WINDOW_NAME,tempImage);
+
+		//鼠标左键松开
+	    if((!g_bDrawingBox) && (Imageflag == 1))
+	    {
+		   Imageflag = 0;
+
+		   if(key == LINE)
+		        DrawLine(srcImage,g_rectangle);
+		
+		   else if(key == CIRCLE)
+				DrawFilledCircle(srcImage,g_rectangle);
+		
+		   else if(key == RECT)		   
+				DrawRectangle(srcImage,g_rectangle);
+		}
+
+	    srcImage.copyTo(tempImage);	
+
+		if(key == ESC)
+		   break;
+	}
+
+	return 0;
+}
